@@ -69,7 +69,7 @@ This project is built for an Overwatch game called [ChessWatch](https://workshop
 ### Built With
 
 * [Python](https://www.python.org/)
-* 
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
