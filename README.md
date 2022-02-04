@@ -81,6 +81,7 @@ This project is built for an Overwatch game called [ChessWatch](https://workshop
 
 * ```pip install pathlib ```
 * ```pip install PySimpleGui ```
+* ```pip install webbrowser ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
