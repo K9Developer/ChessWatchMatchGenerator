@@ -327,7 +327,7 @@ def export_as_overwatch_code(close_window):
 
     # The rule template
     rest = """
-    rule("ChessWatch Match - By Darkshadow - [github link]")
+    rule("ChessWatch Match - By Darkshadow - [https://github.com/KingOfTNT10/ChessWatchMatchGenerator]")
     {
         event
         {
