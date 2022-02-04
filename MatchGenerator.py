@@ -4,6 +4,7 @@ import ctypes
 import os
 import random
 import sys
+import webbrowser
 import winreg
 from pathlib import Path
 
@@ -118,21 +119,34 @@ team_2_grid = [
 ]
 
 main_layout = [
-    [sg.Frame("", team_1_grid, border_width=0)],
-    [sg.Button("", key="-RANDOMIZE_DECK-",
-               image_filename=rf"{Path(sys.argv[0]).parent}\Images\Assets\randomize_deck.png", image_subsample=3,
-               border_width=0, button_color=sg.theme_background_color()),
-     sg.Button("", key="-EXPORT-", image_filename=rf"{Path(sys.argv[0]).parent}\Images\Assets\export.png",
-               image_subsample=3, border_width=0,
-               button_color=sg.theme_background_color())],
-    [sg.Button("", key="-CLEAR_DECK-", image_filename=rf"{Path(sys.argv[0]).parent}\Images\Assets\clear_deck.png",
-               image_subsample=3,
-               border_width=0, button_color=sg.theme_background_color()),
-     sg.Button("", key="-IMPORT-", image_filename=rf"{Path(sys.argv[0]).parent}\Images\Assets\import.png",
-               image_subsample=3, border_width=0,
-               button_color=sg.theme_background_color())],
-    [sg.Frame("", team_2_grid, border_width=0)],
-]
+                  [sg.Frame("", team_1_grid, border_width=0)],
+                  [sg.Button("", key="-RANDOMIZE_DECK-",
+                             image_filename=rf"{Path(sys.argv[0]).parent}\Images\Assets\randomize_deck.png",
+                             image_subsample=3,
+                             border_width=0, button_color=sg.theme_background_color()),
+                   sg.Button("", key="-EXPORT-", image_filename=rf"{Path(sys.argv[0]).parent}\Images\Assets\export.png",
+                             image_subsample=3, border_width=0,
+                             button_color=sg.theme_background_color())],
+                  [sg.Button("", key="-CLEAR_DECK-",
+                             image_filename=rf"{Path(sys.argv[0]).parent}\Images\Assets\clear_deck.png",
+                             image_subsample=3,
+                             border_width=0, button_color=sg.theme_background_color()),
+                   sg.Button("", key="-IMPORT-", image_filename=rf"{Path(sys.argv[0]).parent}\Images\Assets\import.png",
+                             image_subsample=3, border_width=0,
+                             button_color=sg.theme_background_color())],
+                  [sg.Frame("", team_2_grid, border_width=0)],
+                  [sg.HorizontalSeparator()],
+                  [sg.Button("", key="-GITHUB-", image_filename=rf"{Path(sys.argv[0]).parent}\Images\Assets\github.png",
+                             image_subsample=8, border_width=0, button_color=sg.theme_background_color(),
+                             mouseover_colors=(sg.theme_background_color(), sg.theme_background_color())),
+                   sg.Button("", key="-WORKSHOP-",
+                             image_filename=rf"{Path(sys.argv[0]).parent}\Images\Assets\workshop.png",
+                             image_subsample=4, border_width=0, button_color=sg.theme_background_color(),
+                             mouseover_colors=(sg.theme_background_color(), sg.theme_background_color())),
+                   sg.Button("", key="-INFO-", image_filename=rf"{Path(sys.argv[0]).parent}\Images\Assets\info.png",
+                             image_subsample=40, border_width=0, button_color=sg.theme_background_color(),
+                             mouseover_colors=(sg.theme_background_color(), sg.theme_background_color()))],
+              ],
 
 # The main window which contains all grids and buttons
 main_window = sg.Window("ChessWatch Match Generator", main_layout, finalize=True, grab_anywhere=True,
@@ -182,7 +196,7 @@ def generate_hero_selection_layout():
     """
         This will generate a new layout for the hero selection window in a new memory address every time.
 
-        :return: the layout of the ero selection window
+        :return: the layout of the hero selection window
         """
 
     hero_selection_layout = [
@@ -194,6 +208,24 @@ def generate_hero_selection_layout():
         [sg.Button("Select")]
     ]
     return hero_selection_layout
+
+
+def generate_info_layout():
+    """
+        This will generate a new layout for info window in a new memory address every time.
+
+        :return: the layout of the info window
+        """
+
+    info_layout = [
+        [sg.Text("ChessWatch Match Generator is a tool to generate a custom match for ChessWatch.")],
+        [sg.Text("This tool is made by:")],
+        [sg.Text("- DarkShadow")],
+        [sg.Text("ChessWatch was made by:")],
+        [sg.Text("- Moop")],
+        [sg.Text("- DarkShadow")],
+    ]
+    return info_layout
 
 
 def generate_export_settings_layout():
@@ -236,6 +268,21 @@ def create_export_settings_window():
 
         if n_event == "-OVERWATCH_CODE-":
             export_as_overwatch_code(window)
+
+
+def create_info_window():
+    """
+    This function will run the info window by it's own.
+
+    :return: None
+    """
+
+    window = sg.Window("Info", generate_info_layout(), modal=True, finalize=True, disable_minimize=True)
+    while True:
+        n_event, n_values = window.read()
+        if n_event == "Exit" or n_event == sg.WIN_CLOSED:
+            window.close()
+            return None
 
 
 def create_hero_selection_window():
@@ -327,7 +374,7 @@ def export_as_overwatch_code(close_window):
 
     # The rule template
     rest = """
-    rule("ChessWatch Match - By Darkshadow - [https://github.com/KingOfTNT10/ChessWatchMatchGenerator]")
+    rule("ChessWatch Match - By Darkshadow - [github link]")
     {
         event
         {
@@ -572,5 +619,17 @@ while True:
     # updates all of the cells according to the imported data
     if event == "-IMPORT-":
         import_config("" if len(sys.argv) < 2 else sys.argv[1])
+
+    # If the user has clicked the github button it will open the github page
+    if event == "-GITHUB-":
+        webbrowser.open('https://github.com/KingOfTNT10/ChessWatchMatchGenerator')
+
+    # If the user has clicked the workshop button it will open the workshop page
+    if event == "-WORKSHOP-":
+        webbrowser.open('https://workshop.codes/chess-watch')
+
+    # If the user has clicked the info button it will open the info window
+    if event == "-INFO-":
+        create_info_window()
 
 main_window.close()
