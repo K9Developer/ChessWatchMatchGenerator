@@ -173,7 +173,7 @@ def update_cell_image(elem, hero_name=""):
     if hero_name:
         main_window[elem].update(
             image_filename=fr""
-            fr"{Path(sys.argv[0]).parent}\Images\HeroImages\{main_window[elem].metadata['hero'].lower()}.png",
+                           fr"{Path(sys.argv[0]).parent}\Images\HeroImages\{main_window[elem].metadata['hero'].lower()}.png",
             image_subsample=3)
     else:
         main_window[elem].update(
@@ -190,11 +190,14 @@ def generate_properties_editor_layout(default_settings):
 
     lvl = 1 if default_settings["level"] == 1 else 2 if default_settings["level"] == 1.25 else 3
     properties_editor_layout = [
-        [sg.Button("", image_filename=rf"{Path(sys.argv[0]).parent}\Images\Assets\change_hero.png", image_subsample=2, border_width=0, button_color=sg.theme_background_color(), key="-CHANGE_HERO-")],
-        [sg.Button("", key="-EDIT_ITEMS-", image_filename=rf"{Path(sys.argv[0]).parent}\Images\Assets\edit_items.png", image_subsample=2, border_width=0, button_color=sg.theme_background_color())],
+        [sg.Button("", image_filename=rf"{Path(sys.argv[0]).parent}\Images\Assets\change_hero.png", image_subsample=2,
+                   border_width=0, button_color=sg.theme_background_color(), key="-CHANGE_HERO-")],
+        [sg.Button("", key="-EDIT_ITEMS-", image_filename=rf"{Path(sys.argv[0]).parent}\Images\Assets\edit_items.png",
+                   image_subsample=2, border_width=0, button_color=sg.theme_background_color())],
         [sg.Text("Mana:"), sg.Spin(values=mana_values, initial_value=f'{default_settings["mana"]}%', key="-MANA-")],
         [sg.Text("Level:"), sg.Spin(values=level_values, initial_value=lvl, key="-LEVEL-")],
-        [sg.Button("", key="-APPLY-", image_filename=rf"{Path(sys.argv[0]).parent}\Images\Assets\apply.png", image_subsample=2, border_width=0, button_color=sg.theme_background_color())],
+        [sg.Button("", key="-APPLY-", image_filename=rf"{Path(sys.argv[0]).parent}\Images\Assets\apply.png",
+                   image_subsample=2, border_width=0, button_color=sg.theme_background_color())],
     ]
     return properties_editor_layout
 
@@ -378,8 +381,8 @@ def update_item_image(item_name, slot, items):
     item_name = item_name.replace("remove", "")
     items[int(slot.replace("-", "").replace("SLOT", "")) - 1] = item_name
     return items, "-" + slot.replace("-",
-                                     "") + "_IMG-", fr"{Path(sys.argv[0]).parent}\Images\Assets\unknown_item.png" if\
-        not item_name else rf"{Path(sys.argv[0]).parent}\Images\Assets\{item_name}_item.png"
+                                     "") + "_IMG-", fr"{Path(sys.argv[0]).parent}\Images\Assets\unknown_item.png" if \
+               not item_name else rf"{Path(sys.argv[0]).parent}\Images\Assets\{item_name}_item.png"
 
 
 def create_item_slot_selection_window(items=None):
@@ -476,7 +479,8 @@ def create_properties_editor_window(selected_hero, btn, settings):
     :return: updated metadata
     """
 
-    window = sg.Window(f"Hero selection - {selected_hero.title()}", generate_properties_editor_layout(settings), disable_minimize=True, modal=True, keep_on_top=True)
+    window = sg.Window(f"Hero selection - {selected_hero.title()}", generate_properties_editor_layout(settings),
+                       disable_minimize=True, modal=True, keep_on_top=True)
     items = settings["items"]
     while True:
         n_event, n_values = window.read()
@@ -491,7 +495,7 @@ def create_properties_editor_window(selected_hero, btn, settings):
 
         if n_event == "-EDIT_ITEMS-":
             tmp_items = create_item_slot_selection_window(items)
-            if type(tmp_items) is not list:
+            if type(tmp_items) is list:
                 items = tmp_items
 
         if n_event == "-APPLY-":
@@ -672,6 +676,21 @@ def import_config(clicked_file=""):
             main_window[key_id].metadata["items"] = settings[key_id]["items"]
 
 
+def item_list_to_str(items):
+    """
+    Returns the string with first letter upper cased.
+
+    :param items: the items to be converted to string format
+    :return: the items as a string
+    """
+
+    joined_str = ""
+    for counter, item in enumerate(items):
+        if item:
+            joined_str += f"{item.title()}{', ' if counter < 2 else ''}"
+    return "N/A" if not joined_str else joined_str
+
+
 def randomize_deck():
     """
     Randomizes the board, with random heroes in random positions
@@ -775,7 +794,7 @@ while True:
                                                            last_right_clicked_btn,
                                                            main_window[last_right_clicked_btn].metadata)
             if new_metadata:
-                main_window[last_right_clicked_btn].metadata = generate_default_metadata()
+                main_window[last_right_clicked_btn].metadata = new_metadata
         else:
             sg.Popup("This cell is empty, You have to have a hero there to edit it's properties", title="Error")
 
@@ -808,5 +827,14 @@ while True:
     # If the user has clicked the info button it will open the info window
     if event == "-INFO-":
         create_info_window()
+
+    # When a cell is clicked it will popup a window with all it's data
+    if ("T1_" in event or "T2_" in event) and "+RIGHT CLICK+" not in event and main_window[event].metadata['hero']:
+        sg.popup(
+            f"Hero Name: {main_window[event].metadata['hero'].title()}\n"
+            f"Hero Level: {main_window[event].metadata['level']}\n"
+            f"Hero Mana: {int(main_window[event].metadata['mana']) + (25 * main_window[event].metadata['items'].count('mana'))}\n"
+            f"Hero Items: {item_list_to_str(main_window[event].metadata['items'])}\n"
+        )
 
 main_window.close()
